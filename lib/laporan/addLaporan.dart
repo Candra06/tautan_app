@@ -44,14 +44,13 @@ class _AddLaporanState extends State<AddLaporan> {
 
     if (imgSrc != null) {
       setState(() {
-        file = ImagePicker.pickImage(source: imgSrc);
+        foto = ImagePicker.pickImage(source: imgSrc);
         String image = foto.toString();
         print('fotonya ' + image);
         print(foto);
       });
     }
   }
-
   Widget showImage() {
     return Container(
       child: FutureBuilder<File>(
@@ -61,12 +60,27 @@ class _AddLaporanState extends State<AddLaporan> {
               snapshot.data != null) {
             tmpFile = snapshot.data;
             fileName = tmpFile.path.split("/").last;
-
-            print("namafile " + fileName);
             base64Image = base64Encode(snapshot.data.readAsBytesSync());
-            print(base64Image);
-            print("imagenya " + fileName);
-            return Text(fileName);
+            return Column(
+              children: [
+                // Container(
+                //   width: MediaQuery.of(context).size.width,
+                //   height: 200,
+                //   child: Image.file(snapshot.data, fit: BoxFit.contain),
+                // ),
+                Container(
+                  alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width,
+                    child: Text(
+                      fileName,
+                      maxLines: 3,
+                    )),
+              ],
+            );
+            // return Container(
+            //   margin: EdgeInsets.all(8),
+            //   child: Image.file(snapshot.data, fit: BoxFit.fill),
+            // );
           } else if (snapshot.error != null) {
             return const Text(
               'Error saat memilih foto!',
@@ -74,13 +88,43 @@ class _AddLaporanState extends State<AddLaporan> {
             );
           } else {
             return Column(
-              children: <Widget>[Text('Pilih file bukti')],
+              children: <Widget>[Text('Pilih foto (Opsional)')],
             );
           }
         },
       ),
     );
   }
+
+  // Widget showImage() {
+  //   return Container(
+  //     child: FutureBuilder<File>(
+  //       future: foto,
+  //       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.done &&
+  //             snapshot.data != null) {
+  //           tmpFile = snapshot.data;
+  //           fileName = tmpFile.path.split("/").last;
+
+  //           print("namafile " + fileName);
+  //           base64Image = base64Encode(snapshot.data.readAsBytesSync());
+  //           print(base64Image);
+  //           print("imagenya " + fileName);
+  //           return Text(fileName);
+  //         } else if (snapshot.error != null) {
+  //           return const Text(
+  //             'Error saat memilih foto!',
+  //             textAlign: TextAlign.center,
+  //           );
+  //         } else {
+  //           return Column(
+  //             children: <Widget>[Text('Pilih file bukti')],
+  //           );
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
   void simpanLaporan() async {
     Config.loading(context);
@@ -92,7 +136,7 @@ class _AddLaporanState extends State<AddLaporan> {
     };
     final imageUploadRequest = http.MultipartRequest(
       'POST',
-      Uri.parse(Config.ipServerAPI + 'addLaporan'),
+      Uri.parse(Config.ipServerAPI + 'addLink'),
     );
     imageUploadRequest.files
         .add(await http.MultipartFile.fromPath('file_pendukung', tmpFile.path));
@@ -126,7 +170,7 @@ class _AddLaporanState extends State<AddLaporan> {
     body['file_pendukung'] = fileName.toString();
     body['create_by'] = id;
     print(body);
-    var res = await http.post(Config.ipServerAPI + 'addLaporan',
+    var res = await http.post(Config.ipServerAPI + 'addLink',
         body: body,
         headers: {
           'Authorization': 'Bearer ' + token,

@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController txtCari = new TextEditingController();
   bool loadPage = false;
   bool show = false;
-  String status = '', kategori = '', diperiksa = '', link = '';
+  String status = '', kategori = '', diperiksa = '', link = '', statusLink = '';
 
   Future<Null> initUniLinks() async {
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -42,8 +42,12 @@ class _HomePageState extends State<HomePage> {
 
   void logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setString('token', '');
-    Navigator.pushNamed(context, Routes.LOGIN);
+    // await pref.clear();
+    await pref.remove('token');
+    String token = await Config.getToken();
+    print(token);
+    Navigator.pushReplacement(context,
+        PageTransition(child: LoginPage(), type: PageTransitionType.downToUp));
     Config.alert(1, 'Berhasil LogOut');
   }
 
@@ -51,6 +55,34 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     initUniLinks();
     super.initState();
+  }
+
+  void dialogLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Apakah Anda Yakin?'),
+        content: new Text('Ingin Keluar Dari Akun ini?'),
+        actions: <Widget>[
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: new Text(
+              'Tidak',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Config.primary),
+            ),
+          ),
+          new FlatButton(
+            onPressed: () => logout(),
+            child: new Text(
+              'Ya',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Config.primary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<bool> _onWillPop() {
@@ -92,14 +124,25 @@ class _HomePageState extends State<HomePage> {
     print(res.body);
     if (res.statusCode == 200) {
       var data = json.decode(res.body);
-      if (data['value'] == '1' || data['data'] != null) {
+      if (data['value'] == '1' && data['data'] != null) {
         setState(() {
           status = 'available';
+          statusLink = data['value'] ;
           kategori = data['data']['kategori'].toString().toUpperCase();
           diperiksa = data['data']['diperiksa'].toString();
           link = 'http://' + data['data']['link'].toString();
           Navigator.pop(context);
           alert(context);
+        });
+      } else if (data['value'] == '0' && data['data'] != null) {
+        setState(() {
+          status = 'available';
+          statusLink = data['value'] ;
+          kategori = data['data']['kategori'].toString().toUpperCase();
+          diperiksa = data['data']['diperiksa'].toString();
+          link = 'http://' + data['data']['link'].toString();
+          Navigator.pop(context);
+          alertAman(context);
         });
       } else {
         setState(() {
@@ -114,6 +157,36 @@ class _HomePageState extends State<HomePage> {
     } else {
       Navigator.pop(context);
     }
+  }
+
+  alertAman(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Link Aman'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Link tidak mengandung unsur hoax atau penipuan.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                setState(() {
+                  show = true;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   alert(context) {
@@ -195,10 +268,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: Icon(Icons.power_settings_new),
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    PageTransition(
-                        child: LoginPage(), type: PageTransitionType.downToUp));
+                dialogLogout();
               },
             )
           ],
@@ -408,16 +478,16 @@ class _HomePageState extends State<HomePage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          status == 'available'
+                                          status == 'available' && statusLink == '1' 
                                               ? ' Link Berbahaya'
-                                              : ' Link Tidak Terdeteksi ',
+                                              : status == 'available' && statusLink == '0' ? 'Link Aman' :' Link Tidak Terdeteksi ',
                                           style: TextStyle(
-                                              color: status == 'available'
+                                              color: status == 'available' && statusLink == '1' 
                                                   ? Colors.red
-                                                  : Colors.green),
+                                                   : status == 'available' && statusLink == '0'  ? Colors.green : Colors.green ),
                                         ),
                                         Text(status == 'available'
-                                            ? ' $kategori '
+                                            ? ' Di laporkan sebagai $kategori '
                                             : ' - '),
                                         Text(status == 'available'
                                             ? ' $diperiksa kali'

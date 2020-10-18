@@ -25,8 +25,11 @@ class _NavDrawerState extends State<NavDrawer> {
 
   void logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setString('token', '');
+    // await pref.clear();
+    await pref.remove('token');
     Navigator.pushNamed(context, Routes.LOGIN);
+    String token = await Config.getToken();
+    print(token);
     Config.alert(1, 'Berhasil LogOut');
   }
 

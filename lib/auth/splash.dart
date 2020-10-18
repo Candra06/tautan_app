@@ -30,8 +30,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     Future.delayed(Duration(seconds: 3), () async {
       SharedPreferences pref = await SharedPreferences.getInstance();
+
+      String token = await Config.getToken();
+      // print('token '+token);
       if (pref.getInt("key") == 1) {
-        String token = await Config.getToken();
         if (token == '' || token == null) {
           Navigator.of(context).pushReplacement(PageTransition(
               child: LoginPage(), type: PageTransitionType.fade));

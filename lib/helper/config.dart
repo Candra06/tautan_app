@@ -20,7 +20,7 @@ class Config {
   static final HexColor closed = new HexColor('#B3B3B3');
   static final HexColor open = new HexColor('#00C45C');
 
-  static final String ipServer = 'http://kamper.evoindo.com/';
+  static final String ipServer = 'http://sunori.ilkom.unej.ac.id/';
   static final String ipServerAPI = ipServer + 'api/';
   static final String ipAssets = '';
 

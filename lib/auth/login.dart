@@ -136,14 +136,14 @@ class _LoginPageState extends State<LoginPage> {
                       show,
                       _toggleVisibility,
                     )),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.fromLTRB(32, 8, 8, 8),
-                  child: InkWell(
-                    child: Text('Lupa kata sandi?'),
-                    onTap: () {},
-                  ),
-                ),
+                // Container(
+                //   alignment: Alignment.centerLeft,
+                //   margin: EdgeInsets.fromLTRB(32, 8, 8, 8),
+                //   child: InkWell(
+                //     child: Text('Lupa kata sandi?'),
+                //     onTap: () {},
+                //   ),
+                // ),
                 Container(
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(

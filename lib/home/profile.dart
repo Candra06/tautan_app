@@ -45,7 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
     body['name'] = txtNama.text;
     body['nik'] = txtNIK.text;
     body['email'] = txtEmail.text;
-    body['password'] = txtEmail.text;
+    body['password'] = txtRePassword.text;
 
     http.Response up = await http.post(Config.ipServerAPI + 'updateProfil/$idGuest',
         body: body, headers: {'Authorization': 'Bearer ' + token});
